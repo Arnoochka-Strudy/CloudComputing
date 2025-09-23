@@ -1,0 +1,29 @@
+2025-09-22 18:30:58 | SYSTEM | system | BOT_START | Bot started
+2025-09-22 18:30:58 | SYSTEM | system | BOT_READY | Bot handlers registered, starting polling
+2025-09-22 18:33:17 | SYSTEM | system | BOT_START | Bot started
+2025-09-22 18:33:17 | SYSTEM | system | BOT_READY | Bot handlers registered, starting polling
+2025-09-22 18:33:48 | 807848438 | Arnoochka | COMMAND_START | User started bot
+2025-09-22 18:33:54 | 807848438 | Arnoochka | MESSAGE_RECEIVED | Text: как дела?
+2025-09-22 18:33:54 | 807848438 | system | LLM_PROCESSING_START | Starting LLM processing, text length: 9
+2025-09-22 18:33:56 | 807848438 | system | LLM_PROCESSING_END | LLM processing completed, response length: 88
+2025-09-22 18:33:56 | 807848438 | Arnoochka | MESSAGE_SENT | Response length: 88 chars, Text: Привет! У меня всё отлично, спасибо, что спросил(а)! 😊 А как твои дела? Чем могу помочь?
+2025-09-22 18:35:48 | 807848438 | Arnoochka | COMMAND_HELP | User requested help
+2025-09-22 18:35:53 | 807848438 | Arnoochka | COMMAND_NEW_CHAT | User cleared chat history
+2025-09-22 18:36:13 | 807848438 | Arnoochka | MESSAGE_RECEIVED | Text: Почему 2 + 2 = 4?
+2025-09-22 18:36:13 | 807848438 | system | LLM_PROCESSING_START | Starting LLM processing, text length: 17
+2025-09-22 18:36:16 | 807848438 | system | LLM_PROCESSING_END | LLM processing completed, response length: 1929
+2025-09-22 18:36:16 | 807848438 | Arnoochka | MESSAGE_SENT | Response length: 1929 chars, Text: Вопрос «Почему \(2 + 2 = 4\)?» кажется простым, но на самом деле затрагивает основы математики. Дава...
+2025-09-22 18:36:58 | 807848438 | Arnoochka | COMMAND_NEW_CHAT | User cleared chat history
+2025-09-22 18:37:03 | 807848438 | Arnoochka | MESSAGE_RECEIVED | Text: Кто ты по масти?
+2025-09-22 18:37:03 | 807848438 | system | LLM_PROCESSING_START | Starting LLM processing, text length: 16
+2025-09-22 18:37:05 | 807848438 | system | LLM_PROCESSING_END | LLM processing completed, response length: 227
+2025-09-22 18:37:05 | 807848438 | Arnoochka | MESSAGE_SENT | Response length: 227 chars, Text: Я — **"Червовый валет"** в колоде карт Таро (если говорить о мастях в классическом понимании). Но ес...
+2025-09-22 18:59:20 | 807848438 | Arnoochka | COMMAND_START | User started bot
+2025-09-22 21:28:23 | 807848438 | Arnoochka | COMMAND_HELP | User requested help
+2025-09-22 21:28:34 | 807848438 | Arnoochka | COMMAND_NEW_CHAT | User cleared chat history
+2025-09-22 21:28:39 | 807848438 | Arnoochka | COMMAND_START | User started bot
+2025-09-22 22:43:06 | 807848438 | Arnoochka | COMMAND_NEW_CHAT | User requested new chat (no history found)
+2025-09-22 23:40:08 | 807848438 | Arnoochka | COMMAND_START | User started bot
+2025-09-23 00:08:28 | 807848438 | Arnoochka | COMMAND_HELP | User requested help
+2025-09-23 11:02:06 | 807848438 | Arnoochka | COMMAND_HELP | User requested help
+2025-09-23 19:23:20 | 807848438 | Arnoochka | COMMAND_HELP | User requested help
