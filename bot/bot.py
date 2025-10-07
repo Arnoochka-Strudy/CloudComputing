@@ -5,70 +5,76 @@ from huggingface_hub import InferenceClient
 import aiofiles
 import json
 import os
-import logging
-from datetime import datetime
+import asyncpg
 
 class Bot:
     config = None
     client = InferenceClient()
-    logger = None
-    @staticmethod
-    def setup_logger():
-        log_dir = Bot.config['logs']
-        os.makedirs(log_dir, exist_ok=True)
-        logger = logging.getLogger('telegram_bot')
-        logger.setLevel(logging.INFO)
-        formatter = logging.Formatter(
-            '%(asctime)s | %(user_id)s | %(username)s | %(action)s | %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
-        log_file = os.path.join(log_dir, f"bot_{datetime.now().strftime('%Y-%m-%d')}.log")
-        file_handler = logging.FileHandler(log_file, encoding='utf-8')
-        file_handler.setLevel(logging.INFO)
-        file_handler.setFormatter(formatter)
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.INFO)
-        console_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-        logger.addHandler(console_handler)
-        
-        return logger
+    db_pool = None
     
     @staticmethod
     def get_user_info(update: Update) -> dict:
-        """Получение информации о пользователе"""
         user = update.message.from_user if update.message else update.callback_query.from_user
         return {
             'user_id': str(user.id),
-            'username': user.username or 'no_username',
-            'first_name': user.first_name or '',
-            'last_name': user.last_name or ''
-        }
+            'username': user.username or 'unknown',
+            'first_name': user.first_name or ''
+            }
     
     @staticmethod
-    def log_user_action(update: Update, action: str, message: str = ""):
+    async def log_user_action(update: Update, action: str, message: str = ""):
         """Удобный метод для логирования действий пользователя"""
-        user_info = Bot.get_user_info(update)
-        Bot.logger.info(
-            message, 
-            extra={
-                'user_id': user_info['user_id'],
-                'username': user_info['username'],
-                'action': action
+        try:
+            user_info = Bot.get_user_info(update)
+            user_id = user_info['user_id']
+            username = user_info['username']
+            
+            log_data = {
+                'user_id': user_id,
+                'username': username,
+                'action': action,
+                'message': message,
             }
+            
+            async with Bot.db_pool.acquire() as connection:
+                await connection.execute(
+                    """
+                    INSERT INTO tgdb_log (user_id, username, action, message)
+                    VALUES ($1, $2, $3, $4)
+                    """,
+                    log_data['user_id'],
+                    log_data['username'],
+                    log_data['action'],
+                    log_data['message'],
+                )
+        except Exception as e:
+            print(f"Ошибка при логировании: {e}")
+            
+    @staticmethod
+    async def init_db():
+        db_config = Bot.config['db']
+        Bot.db_pool = await asyncpg.create_pool(
+            database=db_config['name'],
+            host=db_config['host'],
+            port=db_config['port'],
+            user=db_config['user'],
+            password=db_config['pass'],
+            min_size=1,
+            max_size=10
         )
+        print("Подключение прошло успешно")
     
     @staticmethod
     async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user_info = Bot.get_user_info(update)
         welcome_message = f"Приветствую вас, {user_info['first_name'] or 'товарищ'}!\n" + Bot.config["info"]
         
-        Bot.log_user_action(update, "COMMAND_START", "User started bot")
+        await Bot.log_user_action(update, "COMMAND_START", "User started bot")
         await update.message.reply_text(welcome_message)
         
     @staticmethod
     async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        Bot.log_user_action(update, "COMMAND_HELP", "User requested help")
+        await Bot.log_user_action(update, "COMMAND_HELP", "User requested help")
         await update.message.reply_text(Bot.config["info"])
     
     @staticmethod
@@ -78,9 +84,9 @@ class Bot:
         
         if os.path.exists(user_file_path):
             os.remove(user_file_path)
-            Bot.log_user_action(update, "COMMAND_NEW_CHAT", "User cleared chat history")
+            await Bot.log_user_action(update, "COMMAND_NEW_CHAT", "User cleared chat history")
         else:
-            Bot.log_user_action(update, "COMMAND_NEW_CHAT", "User requested new chat (no history found)")
+            await Bot.log_user_action(update, "COMMAND_NEW_CHAT", "User requested new chat (no history found)")
             
         await update.message.reply_text("Новый диалог создан!")
 
@@ -89,7 +95,7 @@ class Bot:
         user = update.message.from_user
         user_message = update.message.text
         user_id = user.id
-        Bot.log_user_action(
+        await Bot.log_user_action(
             update, 
             "MESSAGE_RECEIVED", 
             f"Text: {user_message[:100]}{'...' if len(user_message) > 100 else ''}"
@@ -101,8 +107,7 @@ class Bot:
             result = await Bot.generate_llm_text(user_id, user_message)
             await wait_message.delete()
             
-            # Логируем успешный ответ
-            Bot.log_user_action(
+            await Bot.log_user_action(
                 update, 
                 "MESSAGE_SENT", 
                 f"Response length: {len(result)} chars, Text: {result[:100]}{'...' if len(result) > 100 else ''}"
@@ -112,20 +117,12 @@ class Bot:
 
         except Exception as e:
             error_msg = f"❌ Произошла ошибка: {str(e)}"
-            Bot.log_user_action(update, "ERROR", f"Error: {str(e)}")
+            await Bot.log_user_action(update, "ERROR", f"Error: {str(e)}")
             await wait_message.edit_text(error_msg)
             
     @staticmethod
     async def generate_llm_text(user_id: int, text: str) -> str:
         user_file_path = f"{Bot.config['user_dir']}/{user_id}.json"
-        Bot.logger.info(
-            f"Starting LLM processing, text length: {len(text)}",
-            extra={
-                'user_id': str(user_id),
-                'username': 'system',
-                'action': 'LLM_PROCESSING_START'
-            }
-        )
         
         if os.path.exists(user_file_path):
             async with aiofiles.open(user_file_path, 'r', encoding='utf-8') as file:
@@ -150,44 +147,22 @@ class Bot:
 
         async with aiofiles.open(user_file_path, 'w', encoding='utf-8') as file:
             await file.write(json.dumps(context_messages, ensure_ascii=False, indent=2))
-        Bot.logger.info(
-            f"LLM processing completed, response length: {len(assistant_response)}",
-            extra={
-                'user_id': str(user_id),
-                'username': 'system',
-                'action': 'LLM_PROCESSING_END'
-            }
-        )
 
         return assistant_response
 
 def main() -> None:
     with open("config.json") as file:
         Bot.config = json.load(file)
-    Bot.logger = Bot.setup_logger()
-    Bot.logger.info(
-        "Bot started",
-        extra={
-            'user_id': 'SYSTEM',
-            'username': 'system',
-            'action': 'BOT_START'
-        }
-    )
+        
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(Bot.init_db())
+    
     token = Bot.config['token']
     app = ApplicationBuilder().token(token).build()
     app.add_handler(CommandHandler("start", Bot.start))
     app.add_handler(CommandHandler("help", Bot.help_command))
     app.add_handler(CommandHandler("new_chat", Bot.new_chat))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, Bot.generate_text))
-    
-    Bot.logger.info(
-        "Bot handlers registered, starting polling",
-        extra={
-            'user_id': 'SYSTEM',
-            'username': 'system',
-            'action': 'BOT_READY'
-        }
-    )
     
     print("Бот запущен...")
     app.run_polling()

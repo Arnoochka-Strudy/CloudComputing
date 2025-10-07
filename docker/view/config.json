@@ -1,0 +1,7 @@
+{
+    "name": "tgdb",
+    "host": "db",
+    "port": 5432,
+    "user": "admin",
+    "pass": "admin"
+}
