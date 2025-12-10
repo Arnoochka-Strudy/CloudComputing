@@ -1,8 +1,8 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, Response
 app = Flask(__name__)
 
 @app.route("/")
-def index():
+def index() -> Response:
     return jsonify({"message": "OK"})
 
 if __name__ == "__main__":

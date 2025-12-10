@@ -17,7 +17,7 @@ minikube image load backend:latest
 minikube image load frontend:latest
 ```
 
-## 4. Деплой приложения в kubernetes
+## 4. Деплой файлов в kubernetes
 ```bash
 kubectl apply -f backend/deployment.yaml
 kubectl apply -f backend/service.yaml

@@ -6,7 +6,7 @@ app = Flask(__name__)
 BACKEND_URL = "http://backend:5000/"
 
 @app.route("/")
-def index():
+def index() -> str:
     try:
         resp = requests.get(BACKEND_URL).json()
         return f"Frontend: OK<br>Backend: {resp['message']}"
