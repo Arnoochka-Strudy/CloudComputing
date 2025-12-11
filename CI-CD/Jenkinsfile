@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         PYTHONUNBUFFERED = '1' 
-        PROJECT_DIR = 'app-repo-folder' // <--- ПРОВЕРЬ ЭТО ИМЯ!
+        PROJECT_DIR = 'CI-CD' // <--- ПРОВЕРЬ ЭТО ИМЯ!
     }
     
     stages {
@@ -120,18 +120,18 @@ pipeline {
                     )]) {
                         sh '''
                             echo "📦 Публикация образа..."
-                            
+
                             # Логинимся в Docker Hub
                             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                            
+
                             # Тегируем
                             docker tag Scalar:${BUILD_ID} $DOCKER_USER/Scalar:latest
                             docker tag Scalar:${BUILD_ID} $DOCKER_USER/Scalar:${BUILD_ID}
-                            
+
                             # Пушим
                             docker push $DOCKER_USER/Scalar:latest
                             docker push $DOCKER_USER/Scalar:${BUILD_ID}
-                            
+
                             echo "✅ Образ опубликован!"
                         '''
                     }
