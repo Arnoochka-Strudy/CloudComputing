@@ -66,10 +66,10 @@ pipeline {
                 dir("${PROJECT_DIR}") {
                     script {
                         echo "🐳 Сборка Docker образа..."
-                        sh 'docker build -t Scalar:${BUILD_ID} .'
+                        sh 'docker build -t scalar-pipeline:${BUILD_ID} .'
                         
                         sh '''
-                            if docker images | grep -q "Scalar"; then
+                            if docker images | grep -q "scalar-pipeline"; then
                                 echo "✅ Docker образ создан"
                             else
                                 echo "❌ Ошибка сборки Docker образа"
@@ -88,7 +88,7 @@ pipeline {
                         echo "🧪 Тестируем Docker образ..."
                         sh '''
                             docker rm -f scalar-test || true
-                            docker run -d --name scalar-test Scalar:${BUILD_ID}
+                            docker run -d --name scalar-test scalar-pipeline:${BUILD_ID}
                             // ... (остальная логика)
                         '''
                     }
