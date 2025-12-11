@@ -18,7 +18,7 @@ pipeline {
             steps {
                 dir("${PROJECT_DIR}") {
                     sh '''
-                        echo "🐍 Настройка окружения..."
+                        echo "Настройка окружения..."
                         python3 --version
                         
                         if [ ! -d "venv" ]; then
@@ -46,7 +46,7 @@ pipeline {
                 dir("${PROJECT_DIR}") { 
                     sh '''
                         . venv/bin/activate
-                        echo "🧪 Запуск тестов через pytest..."
+                        echo "Запуск тестов..."
                         
                         mkdir -p reports
                         
@@ -65,14 +65,14 @@ pipeline {
             steps {
                 dir("${PROJECT_DIR}") {
                     script {
-                        echo "🐳 Сборка Docker образа..."
+                        echo "Сборка Docker образа..."
                         sh 'docker build -t scalar-pipeline:${BUILD_ID} .'
                         
                         sh '''
                             if docker images | grep -q "scalar-pipeline"; then
-                                echo "✅ Docker образ создан"
+                                echo "Docker образ создан"
                             else
-                                echo "❌ Ошибка сборки Docker образа"
+                                echo "Ошибка сборки Docker образа"
                                 exit 1
                             fi
                         '''
@@ -84,27 +84,20 @@ pipeline {
         stage('Test Docker Image') {
             steps {
                 dir("${PROJECT_DIR}") {
-                    echo "🧪 Тестируем Docker образ..."
+                    echo "Тестируем Docker образ..."
                     sh '''
-                        # 1. Убеждаемся, что старый контейнер удален
                         docker rm -f scalar-test || true
-
-                        # 2. Запускаем контейнер в фоновом режиме
                         docker run -d --name scalar-test scalar-pipeline:${BUILD_ID}
-
-                        # 3. Ждем завершения работы контейнера и получаем код выхода
                         EXIT_CODE=$(docker wait scalar-test)
 
-                        # 4. Смотрим логи
-                        echo "📋 Логи контейнера:"
+                        echo "Логи контейнера:"
                         docker logs scalar-test
 
-                        # 5. Проверяем код выхода (0 = успех)
                         if [ "$EXIT_CODE" -eq 0 ]; then
-                            echo "✅ Docker образ успешно выполнил скрипт (Код $EXIT_CODE)"
-                            docker rm -f scalar-test # Удаляем контейнер
+                            echo "Docker образ успешно выполнил скрипт (Код $EXIT_CODE)"
+                            docker rm -f scalar-test
                         else
-                            echo "❌ Docker образ завершился с ошибкой Python (Код $EXIT_CODE)"
+                            echo "Docker образ завершился с ошибкой Python (Код $EXIT_CODE)"
                             docker rm -f scalar-test || true
                             exit 1
                         fi
@@ -139,14 +132,14 @@ pipeline {
         
         stage('Deploy Notification') {
             steps {
-                echo "🎉 CI/CD Pipeline завершен!"
+                echo "CI/CD Pipeline завершен!"
             }
         }
     }
     
     post {
         always {
-            echo '📊 Сборка завершена'
+            echo 'Сборка завершена'
             sh 'docker system prune -f || true'
         }
     }
