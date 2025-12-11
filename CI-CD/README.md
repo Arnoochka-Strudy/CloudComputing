@@ -7,6 +7,9 @@
 ```bash
 docker compose up -d --build 
 ```
+
+и переходим на [http://localhost:8000](http://localhost:8000)
+
 ### 2.Переходим в Jenkins и скачиваем следующие инструменты
 
  * Pipeline
@@ -15,6 +18,7 @@ docker compose up -d --build
  * Docker
  * DOcker Pipeline
  * JUnit
+
 ### 3.Коммитим репозиторий на Github или Gitlab
 
 ### 4.В Jenkins добавляем Pipeline 
@@ -23,12 +27,20 @@ docker compose up -d --build
 
  2. Добавляем ветку, на которой будет работать Pipeline
 
- 2. Добавляем путь до Jenkinsfile
+ 3. Добавляем путь до Jenkinsfile
 
-![add-git](./add-git.png)
+ 4. В Jenkinsfile добавляем в `PROJECT_DIR` директорию Jenkinsfile
 
-### 5. Запускаем Pipeline в Jenkins
+![add-git](./add-git.png){:width="70%"}
+
+### 5. Добавляем данные docker-hub
+
+ 1. Получаем на docker-hub токен с правами на чтение и запись
+ 2. переходим по ссылке [http://localhost:8080/manage/credentials/store/system/](http://localhost:8080/manage/credentials/store/system/) 
+ 3. Нажимаем на Global credentials (unrestricted) и никнейм на docker-hub и 
 
 ![result](./result.png)
+
+### 6. Запускаем Pipeline в Jenkins
 
 **Дополнительно:** Логи работы Pipeline представлены в `jenkins.log`
