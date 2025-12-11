@@ -1,0 +1,520 @@
+Started by user unknown or anonymous
+Obtained CI-CD/Jenkinsfile from git https://github.com/Arnoochka-Strudy/CloudComputing
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins
+ in /var/jenkins_home/workspace/my-pipeline
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/jenkins_home/workspace/my-pipeline/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/Arnoochka-Strudy/CloudComputing # timeout=10
+Fetching upstream changes from https://github.com/Arnoochka-Strudy/CloudComputing
+ > git --version # timeout=10
+ > git --version # 'git version 2.47.3'
+ > git fetch --tags --force --progress -- https://github.com/Arnoochka-Strudy/CloudComputing +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision e46bfe0ef1b51e09da94d98a74b410b3cfb42b33 (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f e46bfe0ef1b51e09da94d98a74b410b3cfb42b33 # timeout=10
+Commit message: "update"
+First time build. Skipping changelog.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Checkout)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/jenkins_home/workspace/my-pipeline/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/Arnoochka-Strudy/CloudComputing # timeout=10
+Fetching upstream changes from https://github.com/Arnoochka-Strudy/CloudComputing
+ > git --version # timeout=10
+ > git --version # 'git version 2.47.3'
+ > git fetch --tags --force --progress -- https://github.com/Arnoochka-Strudy/CloudComputing +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision e46bfe0ef1b51e09da94d98a74b410b3cfb42b33 (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f e46bfe0ef1b51e09da94d98a74b410b3cfb42b33 # timeout=10
+Commit message: "update"
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Setup Python Environment)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/my-pipeline/CI-CD
+[Pipeline] {
+[Pipeline] sh
++ echo Настройка окружения...
+Настройка окружения...
++ python3 --version
+Python 3.13.5
++ [ ! -d venv ]
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Install Dependencies)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/my-pipeline/CI-CD
+[Pipeline] {
+[Pipeline] sh
++ . venv/bin/activate
++ deactivate nondestructive
++ [ -n  ]
++ [ -n  ]
++ hash -r
++ [ -n  ]
++ unset VIRTUAL_ENV
++ unset VIRTUAL_ENV_PROMPT
++ [ ! nondestructive = nondestructive ]
++ uname
++ export VIRTUAL_ENV=/var/jenkins_home/workspace/my-pipeline/CI-CD/venv
++ _OLD_VIRTUAL_PATH=/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++ PATH=/var/jenkins_home/workspace/my-pipeline/CI-CD/venv/bin:/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++ export PATH
++ VIRTUAL_ENV_PROMPT=venv
++ export VIRTUAL_ENV_PROMPT
++ [ -n  ]
++ [ -z  ]
++ _OLD_VIRTUAL_PS1=# 
++ PS1=(venv) # 
++ export PS1
++ hash -r
++ pip install --upgrade pip
+Requirement already satisfied: pip in ./venv/lib/python3.13/site-packages (25.3)
+
++ pip install -r requirements.txt
+Requirement already satisfied: pytest==8.0.0 in ./venv/lib/python3.13/site-packages (from -r requirements.txt (line 1)) (8.0.0)
+Requirement already satisfied: pylint==3.0.3 in ./venv/lib/python3.13/site-packages (from -r requirements.txt (line 2)) (3.0.3)
+Requirement already satisfied: black==24.1.1 in ./venv/lib/python3.13/site-packages (from -r requirements.txt (line 3)) (24.1.1)
+Requirement already satisfied: iniconfig in ./venv/lib/python3.13/site-packages (from pytest==8.0.0->-r requirements.txt (line 1)) (2.3.0)
+Requirement already satisfied: packaging in ./venv/lib/python3.13/site-packages (from pytest==8.0.0->-r requirements.txt (line 1)) (25.0)
+Requirement already satisfied: pluggy<2.0,>=1.3.0 in ./venv/lib/python3.13/site-packages (from pytest==8.0.0->-r requirements.txt (line 1)) (1.6.0)
+Requirement already satisfied: platformdirs>=2.2.0 in ./venv/lib/python3.13/site-packages (from pylint==3.0.3->-r requirements.txt (line 2)) (4.5.1)
+Requirement already satisfied: astroid<=3.1.0-dev0,>=3.0.1 in ./venv/lib/python3.13/site-packages (from pylint==3.0.3->-r requirements.txt (line 2)) (3.0.3)
+Requirement already satisfied: isort!=5.13.0,<6,>=4.2.5 in ./venv/lib/python3.13/site-packages (from pylint==3.0.3->-r requirements.txt (line 2)) (5.13.2)
+Requirement already satisfied: mccabe<0.8,>=0.6 in ./venv/lib/python3.13/site-packages (from pylint==3.0.3->-r requirements.txt (line 2)) (0.7.0)
+Requirement already satisfied: tomlkit>=0.10.1 in ./venv/lib/python3.13/site-packages (from pylint==3.0.3->-r requirements.txt (line 2)) (0.13.3)
+Requirement already satisfied: dill>=0.3.6 in ./venv/lib/python3.13/site-packages (from pylint==3.0.3->-r requirements.txt (line 2)) (0.4.0)
+Requirement already satisfied: click>=8.0.0 in ./venv/lib/python3.13/site-packages (from black==24.1.1->-r requirements.txt (line 3)) (8.3.1)
+Requirement already satisfied: mypy-extensions>=0.4.3 in ./venv/lib/python3.13/site-packages (from black==24.1.1->-r requirements.txt (line 3)) (1.1.0)
+Requirement already satisfied: pathspec>=0.9.0 in ./venv/lib/python3.13/site-packages (from black==24.1.1->-r requirements.txt (line 3)) (0.12.1)
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+
+[Pipeline] stage
+[Pipeline] { (Run Tests)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/my-pipeline/CI-CD
+[Pipeline] {
+[Pipeline] sh
++ . venv/bin/activate
++ deactivate nondestructive
++ [ -n  ]
++ [ -n  ]
++ hash -r
++ [ -n  ]
++ unset VIRTUAL_ENV
++ unset VIRTUAL_ENV_PROMPT
++ [ ! nondestructive = nondestructive ]
++ uname
++ export VIRTUAL_ENV=/var/jenkins_home/workspace/my-pipeline/CI-CD/venv
++ _OLD_VIRTUAL_PATH=/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++ PATH=/var/jenkins_home/workspace/my-pipeline/CI-CD/venv/bin:/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++ export PATH
++ VIRTUAL_ENV_PROMPT=venv
++ export VIRTUAL_ENV_PROMPT
++ [ -n  ]
++ [ -z  ]
++ _OLD_VIRTUAL_PS1=# 
++ PS1=(venv) # 
++ export PS1
++ hash -r
++ echo Запуск тестов...
+Запуск тестов...
++ mkdir -p reports
++ python3 -m pytest tests/TestScalar.py tests/TestStack.py --verbose --junitxml=reports/junit.xml
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.0.0, pluggy-1.6.0 -- /var/jenkins_home/workspace/my-pipeline/CI-CD/venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /var/jenkins_home/workspace/my-pipeline/CI-CD
+collecting ... collected 9 items
+
+tests/TestScalar.py::TestScalar::test_add PASSED                         [ 11%]
+tests/TestScalar.py::TestScalar::test_mul PASSED                         [ 22%]
+tests/TestScalar.py::TestScalar::test_relu PASSED                        [ 33%]
+tests/TestScalar.py::TestScalar::test_chain_rule_1 PASSED                [ 44%]
+tests/TestScalar.py::TestScalar::test_chain_rule_2 PASSED                [ 55%]
+tests/TestScalar.py::TestScalar::test_chain_rule_3 PASSED                [ 66%]
+tests/TestStack.py::TestStack::test_empty PASSED                         [ 77%]
+tests/TestStack.py::TestStack::test_put_get PASSED                       [ 88%]
+tests/TestStack.py::TestStack::test_capacity_expansion PASSED            [100%]
+
+- generated xml file: /var/jenkins_home/workspace/my-pipeline/CI-CD/reports/junit.xml -
+============================== 9 passed in 0.02s ===============================
+[Pipeline] }
+[Pipeline] // dir
+Post stage
+[Pipeline] junit
+Recording test results
+[Checks API] No suitable checks publisher found.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build Docker Image)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/my-pipeline/CI-CD
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] echo
+Сборка Docker образа...
+[Pipeline] sh
++ docker build -t scalar-pipeline:17 .
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 200B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.11-slim
+
+#2 DONE 2.1s
+
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/5] FROM docker.io/library/python:3.11-slim@sha256:7cd0079a9bd8800c81632d65251048fc2848bf9afda542224b1b10e0cae45575
+#4 resolve docker.io/library/python:3.11-slim@sha256:7cd0079a9bd8800c81632d65251048fc2848bf9afda542224b1b10e0cae45575 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 9.88kB done
+#5 DONE 0.0s
+
+#6 [2/5] WORKDIR /app
+#6 CACHED
+
+#7 [4/5] RUN pip install --no-cache-dir -r requirements.txt
+#7 CACHED
+
+#8 [3/5] COPY requirements.txt .
+#8 CACHED
+
+#9 [5/5] COPY src/ ./src/
+#9 CACHED
+
+#10 exporting to image
+#10 exporting layers done
+#10 exporting manifest sha256:1aa87f999a98658a069caa5fb197228181e96c45fc097b876e841f7d3be2e4bf done
+#10 exporting config sha256:00cadf9ece5477918fa5270895429eb829d3dd6064a50200b35578ebef000a56 done
+#10 exporting attestation manifest sha256:6d18964a3e26195e4bf13178862c75a355236e723d0c199935115180882d8a95 0.0s done
+#10 exporting manifest list sha256:7aa50b26d2d965da61ece329381f4b100bf118a56543e2b12c53b1f06cd0098a done
+#10 naming to docker.io/library/scalar-pipeline:17 done
+#10 unpacking to docker.io/library/scalar-pipeline:17 done
+#10 DONE 0.1s
+[Pipeline] sh
++ + grepdocker images -q scalar-pipeline
+
++ echo Docker образ создан
+Docker образ создан
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Test Docker Image)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/my-pipeline/CI-CD
+[Pipeline] {
+[Pipeline] echo
+Тестируем Docker образ...
+[Pipeline] sh
++ docker rm -f scalar-test
+Error response from daemon: No such container: scalar-test
++ docker run -d --name scalar-test scalar-pipeline:17
+de9a028563b503b13b56dcb91ecb3f11b75b2f01b9f6bec6d81cdc56b57ea532
++ docker wait scalar-test
++ EXIT_CODE=0
++ echo Логи контейнера:
+Логи контейнера:
++ docker logs scalar-test
+a=Scalar(data=5, grad=0.0)
+b=Scalar(data=-7, grad=0.0)
+c=Scalar(data=-10, grad=0.0)
+d=Scalar(data=450, grad=0.0)
+e=Scalar(data=-5400, grad=0.0)
+f=Scalar(data=0.0, grad=1.0)
++ [ 0 -eq 0 ]
++ echo Docker образ успешно выполнил скрипт (Код 0)
+Docker образ успешно выполнил скрипт (Код 0)
++ docker rm -f scalar-test
+
+scalar-test
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Push to Registry)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/my-pipeline/CI-CD
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $DOCKER_PASS
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ docker tag scalar-pipeline:17 arno4ka/scalar-pipeline:17
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [DOCKER_PASS]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ docker login+  -u arno4kaecho **** --password-stdin
+
+
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+[Pipeline] sh
++ docker push arno4ka/scalar-pipeline:17
+The push refers to repository [docker.io/arno4ka/scalar-pipeline]
+
+1733a4cd5954: Waiting
+74ee3971cd98: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+74ee3971cd98: Waiting
+b04feb63a916: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Waiting
+d0d78b03ad59: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+74ee3971cd98: Waiting
+d2c8947af229: Layer already exists
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+74ee3971cd98: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+72cf4c3b8301: Layer already exists
+a906721f4ac2: Waiting
+4d55cfecf366: Waiting
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+74ee3971cd98: Waiting
+a906721f4ac2: Waiting
+4d55cfecf366: Layer already exists
+1733a4cd5954: Waiting
+b04feb63a916: Waiting
+74ee3971cd98: Waiting
+d0d78b03ad59: Waiting
+3f0cdbca744e: Waiting
+a906721f4ac2: Layer already exists
+1733a4cd5954: Layer already exists
+b04feb63a916: Layer already exists
+74ee3971cd98: Waiting
+d0d78b03ad59: Layer already exists
+3f0cdbca744e: Layer already exists
+
+74ee3971cd98: Waiting
+74ee3971cd98: Waiting
+74ee3971cd98: Waiting
+74ee3971cd98: Pushed
+
+17: digest: sha256:7aa50b26d2d965da61ece329381f4b100bf118a56543e2b12c53b1f06cd0098a size: 856
+[Pipeline] echo
+Образ arno4ka/scalar-pipeline:17 опубликован!
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy Notification)
+[Pipeline] echo
+CI/CD Pipeline завершен!
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+Сборка завершена
+[Pipeline] sh
++ docker system prune -f
+Deleted build cache objects:
+9yzfbuuxzz9cyreelxpx4yjiv
+f4yxsw1123a0lil16e37491ai
+zm3xt6bo2ucs0o31n391nzjn8
+
+Total reclaimed space: 49.15kB
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
