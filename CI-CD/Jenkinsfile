@@ -84,14 +84,38 @@ pipeline {
         stage('Test Docker Image') {
             steps {
                 dir("${PROJECT_DIR}") {
-                    script {
-                        echo "🧪 Тестируем Docker образ..."
-                        sh '''
-                            docker rm -f scalar-test || true
-                            docker run -d --name scalar-test scalar-pipeline:${BUILD_ID}
-                            // ... (остальная логика)
-                        '''
-                    }
+                    echo "🧪 Тестируем Docker образ..."
+
+                    sh '''
+                        # Чистим старый контейнер, если вдруг остался
+                        docker rm -f scalar-test || true
+
+                        # Запускаем контейнер (замени scalar на имя образа, который ты использовал: scalar-pipeline)
+                        docker run -d --name scalar-test scalar-pipeline:${BUILD_ID}
+
+                        # Даем время на запуск
+                        sleep 5
+
+                        # Проверяем, что контейнер работает.
+                        # Именно здесь может быть ошибка синтаксиса в if/then/else/fi
+                        if docker ps | grep -q "scalar-test"; then
+                            echo "✅ Контейнер запущен"
+
+                            # Смотрим логи
+                            echo "📋 Логи контейнера:"
+                            docker logs scalar-test
+
+                            # Останавливаем и удаляем
+                            docker stop scalar-test
+                            docker rm scalar-test
+
+                            echo "✅ Docker образ работает корректно"
+                        else
+                            echo "❌ Контейнер не запустился"
+                            docker logs scalar-test || true
+                            exit 1
+                        fi
+                    '''
                 }
             }
         }
