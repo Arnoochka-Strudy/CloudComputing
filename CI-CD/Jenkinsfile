@@ -88,17 +88,17 @@ pipeline {
                     sh '''
                         # 1. Убеждаемся, что старый контейнер удален
                         docker rm -f scalar-test || true
-        
+
                         # 2. Запускаем контейнер в фоновом режиме
                         docker run -d --name scalar-test scalar-pipeline:${BUILD_ID}
-        
+
                         # 3. Ждем завершения работы контейнера и получаем код выхода
                         EXIT_CODE=$(docker wait scalar-test)
-        
+
                         # 4. Смотрим логи
                         echo "📋 Логи контейнера:"
                         docker logs scalar-test
-        
+
                         # 5. Проверяем код выхода (0 = успех)
                         if [ "$EXIT_CODE" -eq 0 ]; then
                             echo "✅ Docker образ успешно выполнил скрипт (Код $EXIT_CODE)"
@@ -121,9 +121,17 @@ pipeline {
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )]) {
-                        sh '''
-                            echo "Образ опубликован!"
-                        '''
+                        script {
+                            def fullImageName = "ваш_логин_dockerhub/scalar-pipeline:${BUILD_ID}"
+
+                            sh "docker tag scalar-pipeline:${BUILD_ID} ${fullImageName}"
+
+                            sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
+
+                            sh "docker push ${fullImageName}"
+
+                            echo "Образ ${fullImageName} опубликован!"
+                        }
                     }
                 }
             }
