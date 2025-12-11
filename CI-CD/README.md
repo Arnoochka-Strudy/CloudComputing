@@ -39,8 +39,10 @@ docker compose up -d --build
  2. переходим по ссылке [http://localhost:8080/manage/credentials/store/system/](http://localhost:8080/manage/credentials/store/system/) 
  3. Нажимаем на Global credentials (unrestricted) и никнейм на docker-hub и 
 
+ ### 6. Запускаем Pipeline в Jenkins
+
 ![result](./result.png)
 
-### 6. Запускаем Pipeline в Jenkins
-
 **Дополнительно:** Логи работы Pipeline представлены в `jenkins.log`
+
+### Радуемся :)
