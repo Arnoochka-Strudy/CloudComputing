@@ -14,16 +14,16 @@ docker compose up -d --build
  * Email Extension
  * Docker
  * DOcker Pipeline
-
+ * JUnit
 ### 3.Коммитим репозиторий на Github или Gitlab
 
 ### 4.В Jenkins добавляем Pipeline 
 
-#### 4.1. Добавляем сссылку на Github
+ 1. Добавляем сссылку на Github
 
-#### 4.2. Добавляем ветку, на которой будет работать Pipeline
+ 2. Добавляем ветку, на которой будет работать Pipeline
 
-### 4.2. Добавляем путь до Jenkinsfile
+ 2. Добавляем путь до Jenkinsfile
 
 ![add-git](./add-git.png)
 
