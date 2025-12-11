@@ -1,117 +1,131 @@
-// ... (начало Jenkinsfile)
-
 pipeline {
     agent any
     
     environment {
         PYTHONUNBUFFERED = '1' 
-        // Определяем имя папки, чтобы не дублировать
-        PROJECT_DIR = 'CI-CD' // <--- ЗАМЕНИ ЭТО НА ИМЯ ТВОЕЙ ПАПКИ
+        PROJECT_DIR = 'app-repo-folder' // <--- ПРОВЕРЬ ЭТО ИМЯ!
     }
     
     stages {
+        
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
         
-        // Оборачиваем все стадии, которые работают с кодом, в dir()
-        stage('Project CI/CD') {
+        stage('Setup Python Environment') {
             steps {
-                dir("${PROJECT_DIR}") {
-                    
-                    // Все шаги внутри dir() теперь запускаются из папки 'app-repo-folder'
-                    
-                    stage('Setup Python Environment') {
-                        steps {
-                            sh '''
-                                echo "🐍 Настройка окружения..."
-                                python3 --version
-                                
-                                if [ ! -d "venv" ]; then
-                                    python3 -m venv venv
-                                fi
-                            '''
-                        }
+                dir("${PROJECT_DIR}") { // <-- Добавляем dir()
+                    sh '''
+                        echo "🐍 Настройка окружения..."
+                        python3 --version
+                        
+                        if [ ! -d "venv" ]; then
+                            python3 -m venv venv
+                        fi
+                    '''
+                }
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                dir("${PROJECT_DIR}") { // <-- Добавляем dir()
+                    sh '''
+                        . venv/bin/activate
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
+                        pip install pytest
+                    '''
+                }
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                dir("${PROJECT_DIR}") { // <-- Добавляем dir()
+                    sh '''
+                        . venv/bin/activate
+                        echo "🧪 Запуск тестов через pytest..."
+                        
+                        mkdir -p reports
+                        
+                        python3 -m pytest tests/ --verbose --junitxml=reports/junit.xml
+                    '''
+                }
+            }
+            post {
+                always {
+                    // Путь к отчету остается правильным
+                    junit "${PROJECT_DIR}/reports/junit.xml" 
+                }
+            }
+        }
+        
+        stage('Build Docker Image') {
+            when {
+                branch 'main'
+            }
+            steps {
+                dir("${PROJECT_DIR}") { // <-- Добавляем dir()
+                    script {
+                        echo "🐳 Сборка Docker образа..."
+                        sh 'docker build -t Scalar:${BUILD_ID} .'
+                        
+                        sh '''
+                            if docker images | grep -q "Scalar"; then
+                                echo "✅ Docker образ создан"
+                            else
+                                echo "❌ Ошибка сборки Docker образа"
+                                exit 1
+                            fi
+                        '''
                     }
-                    
-                    stage('Install Dependencies') {
-                        steps {
-                            // Путь к requirements.txt теперь корректный
-                            sh '''
-                                . venv/bin/activate
-                                pip install --upgrade pip
-                                pip install -r requirements.txt
-                                pip install pytest
-                            '''
-                        }
+                }
+            }
+        }
+        
+        // ... (Остальные стадии: Test Docker Image, Push to Registry, Deploy Notification)
+        
+        stage('Test Docker Image') {
+            when {
+                branch 'main'
+            }
+            steps {
+                dir("${PROJECT_DIR}") { // <-- Добавляем dir()
+                    script {
+                        echo "🧪 Тестируем Docker образ..."
+                        sh '''
+                            docker rm -f scalar-test || true
+                            docker run -d --name scalar-test Scalar:${BUILD_ID}
+                            // ... (остальная логика)
+                        '''
                     }
-                    
-                    stage('Run Tests') {
-                        steps {
-                            // Путь к tests/ теперь корректный
-                            sh '''
-                                . venv/bin/activate
-                                echo "🧪 Запуск тестов через pytest..."
-                                
-                                mkdir -p reports
-                                
-                                # Отчеты создаются в reports/ внутри PROJECT_DIR
-                                python3 -m pytest tests/ --verbose --junitxml=reports/junit.xml
-                            '''
-                        }
-                        post {
-                            always {
-                                // Путь к отчету для JUnit плагина
-                                junit "${PROJECT_DIR}/reports/junit.xml" 
-                            }
-                        }
+                }
+            }
+        }
+        
+        stage('Push to Registry') {
+            when {
+                branch 'main'
+            }
+            steps {
+                dir("${PROJECT_DIR}") { // <-- Добавляем dir()
+                    script {
+                        // ... (логика с withCredentials)
                     }
-                    
-                    stage('Build Docker Image') {
-                        when {
-                            branch 'main'
-                        }
-                        steps {
-                            script {
-                                echo "🐳 Сборка Docker образа..."
-                                // 'docker build .' теперь работает из папки 'app-repo-folder'
-                                sh 'docker build -t Scalar:${BUILD_ID} .'
-                                
-                                // Проверка (оставил как в оригинале)
-                                sh '''
-                                    if docker images | grep -q "Scalar"; then
-                                        echo "✅ Docker образ создан"
-                                    else
-                                        echo "❌ Ошибка сборки Docker образа"
-                                        exit 1
-                                    fi
-                                '''
-                            }
-                        }
-                    }
-                    
-                    // ... (Остальные стадии Test Docker Image, Push to Registry, Deploy Notification) 
-                    // ... (Их тоже нужно перенести внутрь блока dir, так как они используют артефакты)
-                    
-                    stage('Test Docker Image') {
-                        // ... (тело стадии)
-                    }
-                    
-                    stage('Push to Registry') {
-                        // ... (тело стадии)
-                    }
-                    
-                    stage('Deploy Notification') {
-                        // ... (тело стадии)
-                    }
-                } // <--- КОНЕЦ БЛОКА dir("${PROJECT_DIR}")
+                }
+            }
+        }
+        
+        stage('Deploy Notification') {
+            steps {
+                echo "🎉 CI/CD Pipeline завершен!"
             }
         }
     }
     
-    // ... (пост-действия)
     post {
         // ...
         always {
