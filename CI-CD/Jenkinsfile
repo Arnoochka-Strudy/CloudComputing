@@ -122,7 +122,7 @@ pipeline {
                         passwordVariable: 'DOCKER_PASS'
                     )]) {
                         script {
-                            def fullImageName = "ваш_логин_dockerhub/scalar-pipeline:${BUILD_ID}"
+                            def fullImageName = "arno4ka/scalar-pipeline:${BUILD_ID}"
 
                             sh "docker tag scalar-pipeline:${BUILD_ID} ${fullImageName}"
 
