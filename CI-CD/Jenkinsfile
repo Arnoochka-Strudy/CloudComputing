@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         PYTHONUNBUFFERED = '1' 
-        PROJECT_DIR = 'CI-CD' // <--- ПРОВЕРЬ ЭТО ИМЯ!
+        PROJECT_DIR = 'CI-CD'
     }
     
     stages {
@@ -16,7 +16,7 @@ pipeline {
         
         stage('Setup Python Environment') {
             steps {
-                dir("${PROJECT_DIR}") { // <-- Добавляем dir()
+                dir("${PROJECT_DIR}") {
                     sh '''
                         echo "🐍 Настройка окружения..."
                         python3 --version
@@ -31,7 +31,7 @@ pipeline {
         
         stage('Install Dependencies') {
             steps {
-                dir("${PROJECT_DIR}") { // <-- Добавляем dir()
+                dir("${PROJECT_DIR}") { 
                     sh '''
                         . venv/bin/activate
                         pip install --upgrade pip
@@ -43,7 +43,7 @@ pipeline {
         
         stage('Run Tests') {
             steps {
-                dir("${PROJECT_DIR}") { // <-- Добавляем dir()
+                dir("${PROJECT_DIR}") { 
                     sh '''
                         . venv/bin/activate
                         echo "🧪 Запуск тестов через pytest..."
@@ -56,18 +56,14 @@ pipeline {
             }
             post {
                 always {
-                    // Путь к отчету остается правильным
                     junit "${PROJECT_DIR}/reports/junit.xml" 
                 }
             }
         }
         
         stage('Build Docker Image') {
-            when {
-                branch 'main'
-            }
             steps {
-                dir("${PROJECT_DIR}") { // <-- Добавляем dir()
+                dir("${PROJECT_DIR}") {
                     script {
                         echo "🐳 Сборка Docker образа..."
                         sh 'docker build -t Scalar:${BUILD_ID} .'
@@ -85,14 +81,9 @@ pipeline {
             }
         }
         
-        // ... (Остальные стадии: Test Docker Image, Push to Registry, Deploy Notification)
-        
         stage('Test Docker Image') {
-            when {
-                branch 'main'
-            }
             steps {
-                dir("${PROJECT_DIR}") { // <-- Добавляем dir()
+                dir("${PROJECT_DIR}") {
                     script {
                         echo "🧪 Тестируем Docker образ..."
                         sh '''
@@ -106,32 +97,15 @@ pipeline {
         }
         
         stage('Push to Registry') {
-            when {
-                branch 'main'
-            }
             steps {
                 dir("${PROJECT_DIR}") {
-                    // Теперь withCredentials находится непосредственно в блоке dir (который внутри steps)
                     withCredentials([usernamePassword(
                         credentialsId: 'docker-hub',
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )]) {
                         sh '''
-                            echo "📦 Публикация образа..."
-
-                            # Логинимся в Docker Hub
-                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-
-                            # Тегируем
-                            docker tag Scalar:${BUILD_ID} $DOCKER_USER/Scalar:latest
-                            docker tag Scalar:${BUILD_ID} $DOCKER_USER/Scalar:${BUILD_ID}
-
-                            # Пушим
-                            docker push $DOCKER_USER/Scalar:latest
-                            docker push $DOCKER_USER/Scalar:${BUILD_ID}
-
-                            echo "✅ Образ опубликован!"
+                            echo "Образ опубликован!"
                         '''
                     }
                 }
@@ -146,7 +120,6 @@ pipeline {
     }
     
     post {
-        // ...
         always {
             echo '📊 Сборка завершена'
             sh 'docker system prune -f || true'
