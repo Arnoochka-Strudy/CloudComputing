@@ -73,7 +73,7 @@ if __name__ == "__main__":
     b = Scalar(-7)
     c = (a + b) * a
     d = c * c + (a * b) * c
-    e = (a - b + c - d)
+    e = (a + b + c) * d
     f = e.relu()
     f.backward()
     print(f"a={a}\nb={b}\nc={c}\nd={d}\ne={e}\nf={f}")
