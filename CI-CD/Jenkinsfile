@@ -1,0 +1,156 @@
+pipeline {
+    agent any
+    
+    // Определяем переменные среды для пайплайна
+    environment {
+        // Чтобы Python не буферизировал вывод (сразу видел логи)
+        PYTHONUNBUFFERED = '1' 
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Setup Python Environment') {
+            steps {
+                sh '''
+                    echo "🐍 Настройка окружения..."
+                    python3 --version
+                    
+                    # Создаем виртуальное окружение, если его нет
+                    if [ ! -d "venv" ]; then
+                        python3 -m venv venv
+                    fi
+                '''
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                    # Активируем venv и ставим зависимости
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                    # Обязательно ставим pytest, если его нет в requirements.txt
+                    pip install pytest
+                '''
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                sh '''
+                    . venv/bin/activate
+                    echo "🧪 Запуск тестов через pytest..."
+                    
+                    # Создаем папку для отчетов
+                    mkdir -p reports
+                    
+                    # Запускаем тесты с генерацией XML отчета для Jenkins
+                    python3 -m pytest tests/Test* --verbose --junitxml=reports/junit.xml
+                '''
+            }
+            post {
+                always {
+                    // Jenkins считает результаты тестов из этого файла
+                    junit 'reports/junit.xml'
+                }
+            }
+        }
+        
+        stage('Build Docker Image') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    echo "🐳 Сборка Docker образа..."
+                    sh 'docker build -t Scalar:${BUILD_ID} .'
+                    
+                    // Проверка
+                    sh '''
+                        if docker images | grep -q "Scalar"; then
+                            echo "✅ Docker образ создан"
+                        else
+                            echo "❌ Ошибка сборки Docker образа"
+                            exit 1
+                        fi
+                    '''
+                }
+            }
+        }
+        
+        stage('Test Docker Image') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    echo "🧪 Тестируем Docker образ..."
+                    sh '''
+                        # Чистим старый контейнер, если вдруг остался
+                        docker rm -f scalar-test || true
+
+                        # Запускаем контейнер
+                        docker run -d --name scalar-test Scalar:${BUILD_ID}
+                        
+                        sleep 5
+                        
+                        if docker ps | grep -q "scalar-test"; then
+                            echo "✅ Контейнер запущен"
+                            docker logs scalar-test
+                            docker stop scalar-test
+                            docker rm scalar-test
+                        else
+                            echo "❌ Контейнер упал"
+                            docker logs scalar-test || true
+                            exit 1
+                        fi
+                    '''
+                }
+            }
+        }
+        
+        // Этап публикации (оставил как есть, он корректен, только убедись что credentials созданы в Jenkins)
+        stage('Push to Registry') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    // ВАЖНО: Тебе нужно создать credentials с ID 'docker-hub' в Jenkins UI
+                    withCredentials([usernamePassword(
+                        credentialsId: 'docker-hub',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )]) {
+                        sh '''
+                            echo "📦 Публикация..."
+                            # Логин и пуш
+                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                            
+                            docker tag Scalar:${BUILD_ID} $DOCKER_USER/Scalar:latest
+                            docker tag Scalar:${BUILD_ID} $DOCKER_USER/Scalar:${BUILD_ID}
+                            
+                            docker push $DOCKER_USER/Scalar:latest
+                            docker push $DOCKER_USER/Scalar:${BUILD_ID}
+                        '''
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo '📊 Сборка завершена'
+            // Чистим место. || true нужен, чтобы ошибка очистки не валила весь билд
+            sh 'docker system prune -f || true'
+        }
+        // Блоки success/failure с emailext сработают только если установлен плагин Email Extension
+    }
+}

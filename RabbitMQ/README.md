@@ -38,5 +38,11 @@ kubectl get svc
 ```bash
 kubectl port-forward deployment/rabbitmq 15672:15672
 ```
+### Данные для входа
+
+**login:** user
+
+**password:** password
+
 
 ![overview](overview.png)
