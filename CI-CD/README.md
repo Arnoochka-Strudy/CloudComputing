@@ -31,7 +31,7 @@ docker compose up -d --build
 
  4. В Jenkinsfile добавляем в `PROJECT_DIR` директорию Jenkinsfile
 
-![add-git](./add-git.png){:width="70%"}
+<img src="./add-git.png" alt="add-git" width="50%" />
 
 ### 5. Добавляем данные docker-hub
 
