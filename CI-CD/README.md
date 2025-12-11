@@ -44,5 +44,3 @@ docker compose up -d --build
 ![result](./result.png)
 
 **Дополнительно:** Логи работы Pipeline представлены в `jenkins.log`
-
-### Радуемся :)
