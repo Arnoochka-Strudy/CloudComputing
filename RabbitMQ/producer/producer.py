@@ -20,7 +20,7 @@ class Producer:
 
         for _ in range(n):
             for _ in range(k):
-                value = random.randint(1, 100)
+                value = random.randint(1, 5)
                 msg = {"value": value}
 
                 self.channel.basic_publish(
